@@ -2,9 +2,17 @@ export interface YGOCard {
   id: number;
   name: string;
   desc: string;
-  card_images: { image_url: string }[];
+  type?: string;
+  atk?: number;
+  def?: number;
+  level?: number;
+  race?: string;
+  attribute?: string;
+  archetype?: string;
+  card_images: { id: number; image_url: string }[];
+  [key: string]: any;
 }
 
 export interface YGOCardsResponse {
-  data: YGOCard[];
+  data: Record<string, YGOCard>;
 }
