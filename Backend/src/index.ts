@@ -11,21 +11,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// API routes
 app.use("/api/cards", cardsRouter);
 
-// Serve Vite build
 const frontendPath = path.join(__dirname, "../../Frontend/dist");
 app.use(express.static(frontendPath));
 
-// SPA fallback
 app.use((_req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
 
 const PORT = process.env.PORT || 5000;
 
-// Mongo connection
 mongoose
   .connect(process.env.MONGO_URI || "")
   .then(() => {
