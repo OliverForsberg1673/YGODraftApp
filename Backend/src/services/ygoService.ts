@@ -14,7 +14,7 @@ export const fetchAndCacheCards = async (): Promise<ICard[]> => {
       return (await Card.find()) as ICard[];
     }
 
-    console.log("🌐 Fetching cards from YGOPRODeck API...");
+    console.log(" Fetching cards from YGOPRODeck API...");
 
     const response = await axios.get<YGOCardsResponse>(
       "https://db.ygoprodeck.com/api/v7/cardinfo.php"
