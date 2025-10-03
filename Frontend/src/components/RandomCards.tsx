@@ -1,31 +1,36 @@
 import { useEffect, useState } from "react";
-import { fetchAllCards } from "../api/ygopro";
-import type { Card } from "../types";
+
+interface CardImage {
+  image_url: string;
+}
+
+interface Card {
+  _id: string;
+  id: number;
+  name: string;
+  desc: string;
+  type: string;
+  card_images: CardImage[];
+}
 
 export default function RandomCards() {
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchAllCards()
-      .then((data) => {
-        const allCards: Card[] = data.data;
-
-        const randomCards = allCards
-          .sort(() => 0.5 - Math.random())
-          .slice(0, 3);
-
-        setCards(randomCards);
+    fetch("http://localhost:5000/api/cards/random")
+      .then((res) => res.json())
+      .then((data: Card[]) => {
+        setCards(data);
         setLoading(false);
       })
-
       .catch((err) => {
-        console.error(err);
+        console.error("Error fetching cards:", err);
         setLoading(false);
       });
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p>Loading cards...</p>;
 
   return (
     <div
@@ -34,11 +39,12 @@ export default function RandomCards() {
         justifyContent: "center",
         gap: "20px",
         marginTop: "20px",
+        flexWrap: "wrap",
       }}
     >
       {cards.map((card) => (
         <div
-          key={card.id}
+          key={card._id}
           style={{
             padding: "16px",
             border: "1px solid #ccc",
@@ -49,7 +55,7 @@ export default function RandomCards() {
           }}
         >
           <img
-            src={card.card_images[0].image_url}
+            src={card.card_images[0]?.image_url}
             alt={card.name}
             style={{ width: "100%", marginBottom: "10px" }}
           />

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fetchAndCacheCards } from "../services/ygoService";
+import { fetchAndCacheCards } from "../functions/cachefunction";
 
 export const getRandomCards = async (_req: Request, res: Response) => {
   try {
