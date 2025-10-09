@@ -1,0 +1,66 @@
+body {
+  font-family: sans-serif;
+  background-color: #f4f4f4;
+  padding: 20px;
+}
+
+#draft-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.card-option {
+  border: 1px solid #ccc;
+  padding: 5px;
+  cursor: pointer;
+  width: 100px;
+  text-align: center;
+}
+
+.card-option img {
+  width: 100px;
+  height: auto;
+}
+
+.deck-list {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.deck-list h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.deck-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.deck-list li {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.deck-list li:last-child {
+  border-bottom: none;
+}
+
+.deck-list img {
+  width: 48px;
+  height: auto;
+  margin-right: 1rem;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
