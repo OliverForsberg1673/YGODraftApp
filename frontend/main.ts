@@ -53,9 +53,9 @@ function showNextPick() {
   }
 
   const options = draft[currentPick];
-  options.forEach((card) => {
+  options.forEach((card, idx) => {
     const cardDiv = document.createElement("div");
-    cardDiv.className = "card-option";
+    cardDiv.className = `card-option card-option-${idx}`;
 
     const img = document.createElement("img");
     img.src = card.card_images?.[0]?.image_url_small ?? "/placeholder.png";

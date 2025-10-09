@@ -1,7 +1,23 @@
+h1 {
+  color: goldenrod;
+}
+
 body {
   font-family: sans-serif;
-  background-color: #f4f4f4;
+  height: 100%;
   padding: 20px;
+  background-image: url("/bck3.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-attachment: fixed;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 #draft-container {
@@ -10,12 +26,36 @@ body {
   flex-wrap: wrap;
 }
 
-.card-option {
-  border: 1px solid #ccc;
+.card-option-0 {
+  background-color: #232224;
+  border: 1px solid #000000;
   padding: 5px;
   cursor: pointer;
   width: 100px;
   text-align: center;
+}
+
+.card-option-1 {
+  background-color: #ffffff;
+  border: 2px solid #b1afaf;
+  padding: 5px;
+  cursor: pointer;
+  width: 100px;
+  text-align: center;
+}
+
+.card-option-2 {
+  background-color: #5105b4;
+  border: 2px solid #3f0257;
+  padding: 5px;
+  cursor: pointer;
+  width: 100px;
+  text-align: center;
+}
+
+.card-option p {
+  color: goldenrod;
+  font-weight: bold;
 }
 
 .card-option img {
@@ -50,7 +90,7 @@ body {
   display: flex;
   align-items: center;
   padding: 0.5rem 0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #000000;
 }
 
 .deck-list li:last-child {
