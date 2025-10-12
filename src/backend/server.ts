@@ -4,9 +4,9 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import { cacheCards } from "./server/functions/cacheCards.js";
-import cardsRouter from "./server/routes/cards.js";
-import draftRouter from "./server/routes/draft.js";
+import { cacheCards } from "./functions/cacheCards.js";
+import cardsRouter from "./routes/cards.js";
+import draftRouter from "./routes/draft.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
