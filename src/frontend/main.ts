@@ -1,59 +1,140 @@
 interface DraftOption {
   id: number;
   name: string;
-  card_images?: { image_url_small?: string }[];
+  type?: string;
+  atk?: number;
+  def?: number;
+  level?: number;
+  race?: string;
+  attribute?: string;
+  card_images?: {
+    image_url?: string;
+    image_url_small?: string;
+  }[];
 }
 
 let draft: DraftOption[][] = [];
 let currentPick = 0;
-const deck: DraftOption[] = [];
+let deck: DraftOption[] = [];
 
-const draftContainer = document.getElementById("draft-container")!;
-const deckCounter = document.getElementById("deck-counter")!;
+function render() {
+  const root = document.getElementById("app");
+  if (!root) return;
 
-async function fetchDraft() {
-  try {
-    const res = await fetch("/api/draft");
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    draft = data.draft;
-    showNextPick();
-  } catch (err) {
-    console.error("Failed to fetch draft:", err);
-    draftContainer.innerHTML = "<p>Cannot load draft</p>";
+  if (location.hash === "#/deck") {
+    renderDeckPage(root);
+  } else if (location.hash === "#/manage-decks") {
+    renderManageDecksPage(root);
+  } else {
+    renderDraftPage(root);
   }
 }
 
-function showNextPick() {
-  draftContainer.innerHTML = "";
+window.addEventListener("hashchange", render);
+window.addEventListener("DOMContentLoaded", render);
+
+function renderDraftPage(root: HTMLElement) {
+  root.innerHTML = `
+    <h1>Draft Page</h1>
+    <button id="reset-draft-btn">Reset Draft</button>
+    <div id="draft-container"></div>
+    <div id="deck-counter"></div>
+    <a href="#/deck">View Deck</a>
+  `;
+  document
+    .getElementById("reset-draft-btn")
+    ?.addEventListener("click", resetDraft);
+  loadDraft();
+}
+
+function renderManageDecksPage(root: HTMLElement) {
+  root.innerHTML = `
+    <h1>Manage Decks</h1>
+    <div id="decks-list"></div>
+    <a href="#">Back to Draft</a>
+  `;
+  loadDecks();
+}
+
+async function loadDecks() {
+  const res = await fetch("/api/decks");
+  const decks = await res.json();
+  const list = document.getElementById("decks-list");
+  if (!list) return;
+  list.innerHTML = "";
+  decks.forEach((deck: any) => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <strong>${deck.name}</strong>
+      <button data-id="${deck._id}" class="delete-btn">Delete</button>
+    `;
+    list.appendChild(div);
+  });
+  list.querySelectorAll(".delete-btn").forEach((btn) =>
+    btn.addEventListener("click", async (e) => {
+      const id = (e.target as HTMLButtonElement).dataset.id;
+      await fetch(`/api/decks/${id}`, { method: "DELETE" });
+      loadDecks();
+    })
+  );
+}
+
+async function loadDraft() {
+  const res = await fetch("/api/draft");
+  const data = await res.json();
+  draft = data.draft;
+  currentPick = 0;
+  deck = [];
+  renderDraftOptions();
+}
+
+async function resetDraft() {
+  const res = await fetch("/api/draft/reset", { method: "POST" });
+  const data = await res.json();
+  draft = data.draft;
+  currentPick = 0;
+  deck = [];
+  renderDraftOptions();
+}
+
+function renderDraftOptions() {
+  const container = document.getElementById("draft-container");
+  const counter = document.getElementById("deck-counter");
+  if (!container || !counter) return;
+
+  container.innerHTML = "";
+  counter.innerHTML = `<h2>Your Deck (${deck.length}/40)</h2>`;
 
   if (currentPick >= draft.length) {
-    draftContainer.innerHTML = "<p>Deck complete!</p>";
+    container.innerHTML = `
+      <p>Deck complete!</p>
+      <form id="save-deck-form">
+        <input type="text" id="final-deck-name" placeholder="Deck name" required>
+        <button type="submit">Save Deck</button>
+      </form>
+      <a href="#/manage-decks">Manage Decks</a>
+    `;
+    document
+      .getElementById("save-deck-form")
+      ?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = (
+          document.getElementById("final-deck-name") as HTMLInputElement
+        ).value;
+        await fetch("/api/decks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, cards: deck }),
+        });
 
-    const deckListDiv = document.createElement("div");
-    deckListDiv.className = "deck-list";
-    const deckTitle = document.createElement("h3");
-    deckTitle.textContent = "Your Drafted Deck:";
-    deckListDiv.appendChild(deckTitle);
-    const deckUl = document.createElement("ul");
-    deck.forEach((card) => {
-      const li = document.createElement("li");
-      const img = document.createElement("img");
-      img.src = card.card_images?.[0]?.image_url_small ?? "/placeholder.png";
-      img.alt = card.name;
-      img.style.width = "40px";
-      img.style.verticalAlign = "middle";
-      li.appendChild(img);
-      li.appendChild(document.createTextNode(" " + card.name));
-      deckUl.appendChild(li);
-    });
-    deckListDiv.appendChild(deckUl);
-    draftContainer.appendChild(deckListDiv);
+        deck = [];
+        currentPick = 0;
+        window.location.hash = "#/manage-decks";
+      });
     return;
   }
 
-  const options = draft[currentPick];
-  options.forEach((card, idx) => {
+  draft[currentPick].forEach((card, idx) => {
     const cardDiv = document.createElement("div");
     cardDiv.className = `card-option card-option-${idx}`;
 
@@ -68,19 +149,37 @@ function showNextPick() {
     cardDiv.appendChild(name);
 
     cardDiv.addEventListener("click", () => pickCard(card));
-    draftContainer.appendChild(cardDiv);
+    container.appendChild(cardDiv);
   });
-
-  const counterHeading = deckCounter.querySelector("h2");
-  if (counterHeading) {
-    counterHeading.textContent = `Your Deck (${deck.length}/40)`;
-  }
 }
 
 function pickCard(card: DraftOption) {
   deck.push(card);
   currentPick++;
-  showNextPick();
+  renderDraftOptions();
 }
 
-fetchDraft();
+function renderDeckPage(root: HTMLElement) {
+  root.innerHTML = `
+    <h1>Your Deck</h1>
+    <a href="#">Back to Draft</a>
+    <div id="deck-list"></div>
+  `;
+  const deckList = document.getElementById("deck-list");
+  if (!deckList) return;
+  if (deck.length === 0) {
+    deckList.innerHTML = "<p>No cards in deck.</p>";
+    return;
+  }
+  deck.forEach((card) => {
+    const cardDiv = document.createElement("div");
+    cardDiv.className = "card-option";
+    cardDiv.innerHTML = `
+      <img src="${
+        card.card_images?.[0]?.image_url_small ?? "/placeholder.png"
+      }" alt="${card.name}">
+      <p>${card.name}</p>
+    `;
+    deckList.appendChild(cardDiv);
+  });
+}

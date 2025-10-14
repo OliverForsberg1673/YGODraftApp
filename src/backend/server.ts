@@ -1,5 +1,5 @@
 import express from "express";
-import mongoose from "mongoose";
+
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 import { cacheCards } from "./functions/cacheCards.js";
 import cardsRouter from "./routes/cards.js";
 import draftRouter from "./routes/draft.js";
-
+import decksRouter from "./routes/decks.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,11 +15,12 @@ const MONGO_URI = "mongodb://127.0.0.1:27017/yugiohdraft";
 
 async function startServer() {
   try {
-    await mongoose.connect(MONGO_URI);
+    const app = express();
+    app.use(express.json());
     console.log("MongoDB connected");
 
     await cacheCards();
-
+    app.use("/api/decks", decksRouter);
     app.use("/api/cards", cardsRouter);
     app.use("/api/draft", draftRouter);
 

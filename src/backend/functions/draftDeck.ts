@@ -1,4 +1,5 @@
-import { Card } from "../Schemas/Card.js";
+import { getDb } from "./database.js";
+import { Card } from "../types/cardformat.js";
 
 export interface DraftOption {
   id: number;
@@ -15,33 +16,18 @@ export interface DraftOption {
   }[];
 }
 
-export async function generateDraftDeck(): Promise<DraftOption[][]> {
-  const allCards = await Card.find();
+export async function generateDraftDeck(): Promise<Card[][]> {
+  const db = await getDb();
+  const allCards = await db.collection<Card>("cards").find().toArray();
 
-  if (allCards.length === 0) {
-    throw new Error("No cards available in the database.");
-  }
-
-  const draftPicks: DraftOption[][] = [];
-
+  const draftPicks: Card[][] = [];
   for (let i = 0; i < 40; i++) {
-    const options: DraftOption[] = [];
+    const options: Card[] = [];
     for (let j = 0; j < 3; j++) {
-      const randomCard = allCards[Math.floor(Math.random() * allCards.length)];
-      options.push({
-        id: randomCard.id,
-        name: randomCard.name,
-        type: randomCard.type,
-        atk: randomCard.atk,
-        def: randomCard.def,
-        level: randomCard.level,
-        race: randomCard.race,
-        attribute: randomCard.attribute,
-        card_images: randomCard.card_images,
-      });
+      const randomIndex = Math.floor(Math.random() * allCards.length);
+      options.push(allCards[randomIndex]);
     }
     draftPicks.push(options);
   }
-
   return draftPicks;
 }
