@@ -20,4 +20,16 @@ test("can draft and save a deck, then view it", async ({ page }) => {
 
   await page.click(".show-cards-btn");
   await expect(page.getByText("Playwright Test Deck")).toBeVisible();
+
+  const decks = await page.evaluate(async () => {
+    const res = await fetch("/api/decks");
+    return await res.json();
+  });
+
+  const testDeck = decks.find((d: any) => d.name === "Playwright Test Deck");
+  if (testDeck) {
+    await page.evaluate(async (id) => {
+      await fetch(`/api/decks/${id}`, { method: "DELETE" });
+    }, testDeck._id);
+  }
 });
