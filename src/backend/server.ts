@@ -24,13 +24,11 @@ async function startServer() {
     app.use("/api/draft", draftRouter);
 
     if (process.env.NODE_ENV === "production") {
-      // Serve static files from dist/frontend
-      app.use(express.static(path.resolve(__dirname, "../frontend/dist")));
+      app.use(express.static(path.resolve(__dirname, "../frontend")));
       app.get("*", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
+        res.sendFile(path.resolve(__dirname, "../frontend/index.html"));
       });
     } else {
-      // Vite middleware for development
       const vite = await createViteServer({
         root: path.resolve(__dirname, "../frontend"),
         server: {
