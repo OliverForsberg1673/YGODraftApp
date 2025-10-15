@@ -20,4 +20,13 @@ jobs:
         run: npx playwright install --with-deps
 
       - run: npm run test:unit
+
+      - name: Start server
+        run: npm run dev &
+        env:
+          PORT: 3000
+
+      - name: Wait for server to be ready
+        run: npx wait-on http://localhost:3000
+
       - run: npm run test:e2e
