@@ -19,9 +19,5 @@ test("can draft and save a deck, then view it", async ({ page }) => {
   ).toBeVisible();
 
   await page.click(".show-cards-btn");
-
-  await expect(
-    page.locator(".deck-link", { hasText: "Playwright Test Deck" })
-  ).toBeVisible();
+  await expect(page.getByText("Playwright Test Deck")).toBeVisible();
 });
-//Kollar enbart att första kortleken har rätt namn!
