@@ -6,6 +6,7 @@
     "dev": "tsx src/backend/server.ts",
     "build": "vite build --config src/frontend/vite.config.js",
     "start": "NODE_ENV=production node src/backend/server.ts",
+    "test:unit": "vitest",
     "test:e2e": "playwright test"
   },
   "dependencies": {
