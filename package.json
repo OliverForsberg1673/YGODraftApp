@@ -4,8 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "tsx src/backend/server.ts",
-    "build": "vite build --config src/frontend/vite.config.js",
-    "start": "NODE_ENV=production node src/backend/server.ts",
+    "build:backend": "tsc --project tsconfig.json",
+    "build": "vite build --config src/frontend/vite.config.js && npm run build:backend",
+    "start": "NODE_ENV=production node dist/backend/server.js",
     "test:unit": "vitest",
     "test:e2e": "playwright test"
   },
