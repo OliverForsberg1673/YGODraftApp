@@ -1,2 +1,10 @@
 import { defineConfig } from "vite";
-export default defineConfig({});
+import { resolve } from "path";
+
+export default defineConfig({
+  root: resolve(__dirname, "."),
+  build: {
+    outDir: "dist",
+    emptyOutDir: true,
+  },
+});

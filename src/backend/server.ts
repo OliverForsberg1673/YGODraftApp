@@ -23,31 +23,40 @@ async function startServer() {
     app.use("/api/cards", cardsRouter);
     app.use("/api/draft", draftRouter);
 
-    const vite = await createViteServer({
-      root: path.resolve(__dirname, "../frontend"),
-      server: {
-        middlewareMode: true,
-        hmr: true,
-      },
-    });
-    app.use(vite.middlewares);
+    if (process.env.NODE_ENV === "production") {
+      // Serve static files from dist/frontend
+      app.use(express.static(path.resolve(__dirname, "../frontend/dist")));
+      app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
+      });
+    } else {
+      // Vite middleware for development
+      const vite = await createViteServer({
+        root: path.resolve(__dirname, "../frontend"),
+        server: {
+          middlewareMode: true,
+          hmr: true,
+        },
+      });
+      app.use(vite.middlewares);
 
-    app.use("*", async (req, res, next) => {
-      try {
-        const url = req.originalUrl;
-        const template = await vite.transformIndexHtml(
-          url,
-          path.resolve(__dirname, "../frontend/index.html")
-        );
-        res.status(200).set({ "Content-Type": "text/html" }).end(template);
-      } catch (err) {
-        vite.ssrFixStacktrace(err as Error);
-        next(err);
-      }
-    });
+      app.use("*", async (req, res, next) => {
+        try {
+          const url = req.originalUrl;
+          const template = await vite.transformIndexHtml(
+            url,
+            path.resolve(__dirname, "../frontend/index.html")
+          );
+          res.status(200).set({ "Content-Type": "text/html" }).end(template);
+        } catch (err) {
+          vite.ssrFixStacktrace(err as Error);
+          next(err);
+        }
+      });
+    }
 
     app.listen(PORT, () => {
-      console.log(` Server + Vite running on http://localhost:${PORT}`);
+      console.log(`Server running on http://localhost:${PORT}`);
     });
   } catch (err) {
     console.error("Server startup error:", err);
