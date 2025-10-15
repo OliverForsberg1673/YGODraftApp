@@ -21,10 +21,14 @@ jobs:
 
       - run: npm run test:unit
 
-      - name: Start server
-        run: npm run dev &
+      - name: Build production app
+        run: npm run build
+
+      - name: Start production server
+        run: npm start &
         env:
           PORT: 3000
+          NODE_ENV: production
 
       - name: Wait for server to be ready
         run: npx wait-on http://localhost:3000
