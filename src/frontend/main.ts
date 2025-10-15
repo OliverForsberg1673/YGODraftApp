@@ -39,7 +39,7 @@ function renderDraftPage(root: HTMLElement) {
     <button id="reset-draft-btn">Reset Draft</button>
     <div id="draft-container"></div>
     <div id="deck-counter"></div>
-    <a href="#/deck">View Deck</a>
+    
   `;
   document
     .getElementById("reset-draft-btn")
@@ -65,18 +65,104 @@ async function loadDecks() {
   decks.forEach((deck: any) => {
     const div = document.createElement("div");
     div.innerHTML = `
-      <strong>${deck.name}</strong>
+      <strong class="deck-link" data-id="${deck._id}">${deck.name}</strong>
+      <button data-id="${deck._id}" class="edit-btn">Edit</button>
       <button data-id="${deck._id}" class="delete-btn">Delete</button>
+      <button data-id="${deck._id}" class="show-cards-btn">Show Cards</button>
     `;
     list.appendChild(div);
-  });
-  list.querySelectorAll(".delete-btn").forEach((btn) =>
-    btn.addEventListener("click", async (e) => {
+
+    // Edit button logic (as before)
+    div.querySelector(".edit-btn")?.addEventListener("click", () => {
+      const nameEl = div.querySelector(".deck-link") as HTMLElement;
+      const oldName = nameEl.textContent || "";
+      nameEl.outerHTML = `
+        <input type="text" class="edit-name-input" value="${oldName}" style="width:120px;">
+      `;
+      const input = div.querySelector(".edit-name-input") as HTMLInputElement;
+      input.focus();
+
+      const editBtn = div.querySelector(".edit-btn") as HTMLButtonElement;
+      editBtn.style.display = "none";
+      const saveBtn = document.createElement("button");
+      saveBtn.textContent = "Save";
+      saveBtn.className = "save-btn";
+      saveBtn.onclick = async () => {
+        const newName = input.value.trim();
+        if (!newName) return;
+        await fetch(`/api/decks/${deck._id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: newName, cards: deck.cards }),
+        });
+        loadDecks();
+      };
+      editBtn.parentNode?.insertBefore(saveBtn, editBtn);
+
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") saveBtn.click();
+      });
+    });
+
+    // Delete button logic (as before)
+    div.querySelector(".delete-btn")?.addEventListener("click", async (e) => {
       const id = (e.target as HTMLButtonElement).dataset.id;
       await fetch(`/api/decks/${id}`, { method: "DELETE" });
       loadDecks();
-    })
-  );
+    });
+
+    // Show Cards button logic
+    div
+      .querySelector(".show-cards-btn")
+      ?.addEventListener("click", async () => {
+        const view = document.getElementById("deck-cards-view");
+        if (!view) {
+          // Create the view container if it doesn't exist
+          const newView = document.createElement("div");
+          newView.id = "deck-cards-view";
+          div.parentElement?.appendChild(newView);
+        }
+        await showDeckCards(deck._id);
+      });
+  });
+}
+
+// Add this function if not present
+async function showDeckCards(deckId: string) {
+  const res = await fetch(`/api/decks/${deckId}`);
+  if (!res.ok) {
+    const view = document.getElementById("deck-cards-view");
+    if (view) view.innerHTML = "<p>Deck not found.</p>";
+    return;
+  }
+  const deck = await res.json();
+  let view = document.getElementById("deck-cards-view");
+  if (!view) {
+    view = document.createElement("div");
+    view.id = "deck-cards-view";
+    document.body.appendChild(view);
+  }
+  if (!deck.cards || !deck.cards.length) {
+    view.innerHTML = "<p>No cards in this deck.</p>";
+    return;
+  }
+  view.innerHTML = `
+  <h3>Cards in "${deck.name}"</h3>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;">
+    ${deck.cards
+      .map(
+        (card: any) => `
+      <div style="width:100px;text-align:center;">
+        <img src="${
+          card.card_images?.[0]?.image_url_small ?? "/placeholder.png"
+        }" alt="${card.name}" style="width:100px;">
+        <div class="deck-card-name">${card.name}</div>
+      </div>
+    `
+      )
+      .join("")}
+  </div>
+`;
 }
 
 async function loadDraft() {

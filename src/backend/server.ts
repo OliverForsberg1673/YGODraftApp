@@ -1,5 +1,5 @@
+import "dotenv/config";
 import express from "express";
-
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -8,10 +8,9 @@ import { cacheCards } from "./functions/cacheCards.js";
 import cardsRouter from "./routes/cards.js";
 import draftRouter from "./routes/draft.js";
 import decksRouter from "./routes/decks.js";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const app = express();
 const PORT = process.env.PORT || 3000;
-const MONGO_URI = "mongodb://127.0.0.1:27017/yugiohdraft";
 
 async function startServer() {
   try {
@@ -48,7 +47,7 @@ async function startServer() {
     });
 
     app.listen(PORT, () => {
-      console.log(`🚀 Server + Vite running on http://localhost:${PORT}`);
+      console.log(` Server + Vite running on http://localhost:${PORT}`);
     });
   } catch (err) {
     console.error("Server startup error:", err);

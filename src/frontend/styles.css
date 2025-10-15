@@ -1,7 +1,15 @@
+p {
+  color: goldenrod;
+}
+
 h1 {
   color: goldenrod;
 }
 h2 {
+  color: goldenrod;
+}
+
+h3 {
   color: goldenrod;
 }
 
@@ -106,4 +114,23 @@ body {
   margin-right: 1rem;
   border-radius: 4px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.deck-card-name {
+  color: goldenrod;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px #000;
+}
+
+.deck-card-name:hover {
+  color: #ffdf00;
+}
+
+.deck-link {
+  color: #e6b800;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.deck-link:hover {
+  color: #ffdf00;
 }

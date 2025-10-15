@@ -1,7 +1,5 @@
 import { getDb } from "./database.js";
 import { Card } from "../types/cardformat.js";
-import fs from "fs/promises";
-import path from "path";
 
 export async function cacheCards() {
   const db = await getDb();
@@ -13,10 +11,13 @@ export async function cacheCards() {
     return;
   }
 
-  const cardsPath = path.resolve(process.cwd(), "cards.json");
-  const data = await fs.readFile(cardsPath, "utf-8");
-  const cards: Card[] = JSON.parse(data);
+  const response = await fetch("https://db.ygoprodeck.com/api/v7/cardinfo.php");
+  if (!response.ok) {
+    throw new Error("Failed to fetch cards from ygoprodeck API");
+  }
+  const data = await response.json();
+  const cards: Card[] = data.data;
 
   await cardsCollection.insertMany(cards);
-  console.log(`Cached ${cards.length} cards to MongoDB.`);
+  console.log(`Cached ${cards.length} cards to MongoDB from ygoprodeck API.`);
 }
