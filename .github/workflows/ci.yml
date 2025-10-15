@@ -24,8 +24,13 @@ jobs:
       - name: Build production app
         run: npm run build
 
-      - name: Run e2e tests with server
-        run: npm run ci:e2e
+      - name: Run e2e tests with server and in-memory MongoDB
+        run: |
+          npx concurrently -k -s first -n mongo,server,test \
+            "npx mongodb-memory-server-runner --port 27017" \
+            "npm start" \
+            "npx wait-on http://localhost:3000 && npm run test:e2e"
         env:
           PORT: 3000
-          NODE_ENV: production
+          NODE_ENV: test
+          MONGO_URI: mongodb://127.0.0.1:27017/test
