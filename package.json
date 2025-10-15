@@ -20,6 +20,7 @@
     "@playwright/test": "^1.56.0",
     "@types/express": "^4.17.21",
     "@types/node": "^20.19.20",
+    "concurrently": "^9.2.1",
     "mongodb-memory-server": "^10.2.3",
     "ts-node": "^10.9.1",
     "tsx": "^4.20.6",
