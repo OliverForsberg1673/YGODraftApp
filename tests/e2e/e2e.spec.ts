@@ -26,10 +26,10 @@ test("can draft and save a deck, then view it", async ({ page }) => {
     return await res.json();
   });
 
-  const testDeck = decks.find((d: any) => d.name === "Playwright Test Deck");
-  if (testDeck) {
+  const testDecks = decks.filter((d: any) => d.name === "Playwright Test Deck");
+  for (const deck of testDecks) {
     await page.evaluate(async (id) => {
       await fetch(`/api/decks/${id}`, { method: "DELETE" });
-    }, testDeck._id);
+    }, deck._id);
   }
 });
