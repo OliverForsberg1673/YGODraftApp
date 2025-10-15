@@ -8,7 +8,8 @@
     "build": "npm run build:backend && vite build --config src/frontend/vite.config.js",
     "start": "NODE_ENV=production node dist/backend/server.js",
     "test:unit": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "ci:e2e": "concurrently -k -s first -n server,test \"npm start\" \"npx wait-on http://localhost:3000 && npm run test:e2e\""
   },
   "dependencies": {
     "dotenv": "^16.3.1",
