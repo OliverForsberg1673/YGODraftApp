@@ -4,7 +4,7 @@ import { resolve } from "path";
 export default defineConfig({
   root: resolve(__dirname, "."),
   build: {
-    outDir: "dist",
+    outDir: "../../dist/frontend",
     emptyOutDir: true,
   },
 });
