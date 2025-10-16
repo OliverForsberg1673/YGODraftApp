@@ -72,7 +72,6 @@ async function loadDecks() {
     `;
     list.appendChild(div);
 
-    // Edit button logic (as before)
     div.querySelector(".edit-btn")?.addEventListener("click", () => {
       const nameEl = div.querySelector(".deck-link") as HTMLElement;
       const oldName = nameEl.textContent || "";
@@ -104,20 +103,17 @@ async function loadDecks() {
       });
     });
 
-    // Delete button logic (as before)
     div.querySelector(".delete-btn")?.addEventListener("click", async (e) => {
       const id = (e.target as HTMLButtonElement).dataset.id;
       await fetch(`/api/decks/${id}`, { method: "DELETE" });
       loadDecks();
     });
 
-    // Show Cards button logic
     div
       .querySelector(".show-cards-btn")
       ?.addEventListener("click", async () => {
         const view = document.getElementById("deck-cards-view");
         if (!view) {
-          // Create the view container if it doesn't exist
           const newView = document.createElement("div");
           newView.id = "deck-cards-view";
           div.parentElement?.appendChild(newView);
@@ -127,7 +123,6 @@ async function loadDecks() {
   });
 }
 
-// Add this function if not present
 async function showDeckCards(deckId: string) {
   const res = await fetch(`/api/decks/${deckId}`);
   if (!res.ok) {
